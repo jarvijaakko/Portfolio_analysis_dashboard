@@ -29,31 +29,35 @@ os.chdir('/home/vesis/Documents/Python/Portfolio_analysis')
 
 init_notebook_mode(connected=True)
 
-portfolio_df = pd.read_excel('Sample stocks acquisition dates_costs.xlsx')#, sheetname='Sample')
-portfolio_df.head(10)
+portfolio_df = pd.read_excel('Sample stocks acquisition dates_costs_v2.xlsx')
 
 # Define the date variables
-start_sp = datetime.datetime(2020, 1, 1)                  
-end_sp = datetime.datetime(2020, 12, 7)                  
-end_of_last_year = datetime.datetime(2017, 12, 29)
-start_stocks = datetime.datetime(2013, 1, 1)                  
-end_stocks = datetime.datetime(2018, 3, 7)      # Muutettu päivää aiemmaksi
+start_omxh = datetime.datetime(2019, 12, 29)
+end_omxh = datetime.datetime(2020, 12, 7)
+end_of_last_year = datetime.datetime(2019, 12, 30)
+start_stocks = datetime.datetime(2019, 12, 29)
+end_stocks = datetime.datetime(2020, 12, 7)
 
-# Pulling the SP 500 data from Yahoo! Finance
-sp500 = pdr.get_data_yahoo('^GSPC', start_sp, end_sp)
-sp500.head()
-sp500.tail()
-# Jee
-# SP 500 data including only the closing value column
-sp_500_adj_close = sp500[['Adj Close']].reset_index()
-sp_500_adj_close.tail()
+# Pulling the OMXH 25 data from Yahoo! Finance
+omxh25 = pdr.get_data_yahoo('^OMXH25', start_omxh, end_omxh)
+omxh25.head()
+omxh25.tail()
+
+# OMXH 25 data including only the closing value column
+omxh_25_adj_close = omxh25[['Adj Close']].reset_index()
+# omxh_25_adj_close.tail()
+
+# Plotting the index with matplotlib.pyplot
+plt.plot(omxh_25_adj_close['Date'], omxh_25_adj_close['Adj Close'])
+plt.grid()
 
 # Last year's value to be used in the YTD calculation
-sp_500_adj_close_start = sp_500_adj_close[sp_500_adj_close['Date'] == end_of_last_year]
+omxh_25_adj_close_start = omxh_25_adj_close[omxh_25_adj_close['Date'] == end_of_last_year]
 
 # Pulling the tickers' data from Yahoo! Finance
 tickers = portfolio_df['Ticker'].unique()
 
+# Function for pulling the ticker data
 def get(tickers, startdate, enddate):
     def data(ticker):
         return(pdr.get_data_yahoo(ticker, start = startdate, end = enddate))
@@ -61,8 +65,8 @@ def get(tickers, startdate, enddate):
     return pd.concat(datas, keys = tickers, names = ['Ticker', 'Date'])
 
 all_data = get(tickers, start_stocks, end_stocks)
-
 all_data.head()
+all_data.tail()
 
 # Stocks' data including only the closing value column
 adj_close = all_data[['Adj Close']].reset_index()
@@ -72,6 +76,7 @@ adj_close.tail()
 adj_close_start = adj_close[adj_close['Date'] == end_of_last_year]
 adj_close_start.head(10)
 
+end_stocks = datetime.datetime(2020, 12, 4)
 adj_close_latest = adj_close[adj_close['Date'] == end_stocks]
 adj_close_latest.head(10)
 
@@ -82,7 +87,7 @@ adj_close_latest.head()
 portfolio_df.set_index(['Ticker'], inplace=True)
 portfolio_df.head()
 
-# Merge portfolio_df with with adj_close 
+# Merge portfolio_df with adj_close 
 merged_portfolio = pd.merge(portfolio_df, adj_close_latest, left_index=True, right_index=True)
 merged_portfolio.head(10)
 
@@ -93,57 +98,59 @@ merged_portfolio
 # Resetting the index
 merged_portfolio.reset_index(inplace=True)
 
-# Merge merged_portfolio with SP 500 adj_close values based on the acquisition date
-merged_portfolio_sp = pd.merge(merged_portfolio, sp_500_adj_close, left_on='Acquisition Date', right_on='Date')    
-merged_portfolio_sp.head()
+# Merge merged_portfolio with OMXH 25 adj_close values based on the acquisition date
+merged_portfolio_omxh = pd.merge(merged_portfolio, omxh_25_adj_close, left_on='Acquisition Date', right_on='Date')    
+merged_portfolio_omxh.head()
 
 # Delete double Date column and rename columns
-del merged_portfolio_sp['Date_y']
-merged_portfolio_sp.rename(columns={'Date_x':'Latest Date','Adj Close_x':'Ticker Adj Close','Adj Close_y':'SP 500 Initial Close'}, inplace=True)
-merged_portfolio_sp.head()
+del merged_portfolio_omxh['Date_y']
+merged_portfolio_omxh.rename(columns={'Date_x':'Latest Date','Adj Close_x':'Ticker Adj Close','Adj Close_y':'OMXH 25 Initial Close'}, inplace=True)
+merged_portfolio_omxh.head()
 
-# SP 500 eq shares
-merged_portfolio_sp['Equiv SP Shares'] = merged_portfolio_sp[' '] / merged_portfolio_sp['SP 500 Initial Close']
-merged_portfolio_sp.head()
+# OMXH 25 eq shares
+merged_portfolio_omxh['Equiv OMXH Shares'] = merged_portfolio_omxh['Cost Basis'] / merged_portfolio_omxh['OMXH 25 Initial Close']
+merged_portfolio_omxh.head()
 
-# Merge merged_portfolio_sp with SP 500 adj_close values based on the end date
-merged_portfolio_sp_latest = pd.merge(merged_portfolio_sp, sp_500_adj_close, left_on='Latest Date', right_on='Date')
-merged_portfolio_sp_latest.head()        
+# Merge merged_portfolio_sp with OMXH 25 adj_close values based on the end date
+merged_portfolio_omxh_latest = pd.merge(merged_portfolio_omxh, omxh_25_adj_close, left_on='Latest Date', right_on='Date')
+merged_portfolio_omxh_latest.head()
 
 # Delete double Date column and rename columns
 del merged_portfolio_sp_latest['Date']
-merged_portfolio_sp_latest.rename(columns={'Adj Close':'SP 500 Latest Close'}, inplace=True)
-merged_portfolio_sp_latest.head()
+merged_portfolio_omxh_latest.rename(columns={'Adj Close':'OMXH 25 Latest Close'}, inplace=True)
+merged_portfolio_omxh_latest.head()
 
 # Define a bunch of columns
 # Percent return of SP from acquisition date of position through latest trading day.
-merged_portfolio_sp_latest['SP Return'] = merged_portfolio_sp_latest['SP 500 Latest Close'] / merged_portfolio_sp_latest['SP 500 Initial Close'] - 1
+merged_portfolio_omxh_latest['OMXH 25 Return'] = merged_portfolio_omxh_latest['OMXH 25 Latest Close'] / merged_portfolio_omxh_latest['OMXH 25 Initial Close'] - 1
 
 # This is a new column which takes the tickers return and subtracts the sp 500 equivalent range return.
-merged_portfolio_sp_latest['Abs. Return Compare'] = merged_portfolio_sp_latest['ticker return'] - merged_portfolio_sp_latest['SP Return']
+merged_portfolio_omxh_latest['Abs. Return Compare'] = merged_portfolio_omxh_latest['ticker return'] - merged_portfolio_omxh_latest['OMXH 25 Return']
 
 # This is a new column where we calculate the ticker's share value by multiplying the original quantity by the latest close.
-merged_portfolio_sp_latest['Ticker Share Value'] = merged_portfolio_sp_latest['Quantity'] * merged_portfolio_sp_latest['Ticker Adj Close']
+merged_portfolio_omxh_latest['Ticker Share Value'] = merged_portfolio_omxh_latest['Quantity'] * merged_portfolio_omxh_latest['Ticker Adj Close']
 
 # We calculate the equivalent SP 500 Value if we take the original SP shares * the latest SP 500 share price.
-merged_portfolio_sp_latest['SP 500 Value'] = merged_portfolio_sp_latest['Equiv SP shares'] * merged_portfolio_sp_latest['SP 500 Latest Close']
+merged_portfolio_omxh_latest['OMXH 25 Value'] = merged_portfolio_omxh_latest['Equiv OMXH Shares'] * merged_portfolio_omxh_latest['OMXH 25 Latest Close']
 
 # This is a new column where we take the current market value for the shares and subtract the SP 500 value.
-merged_portfolio_sp_latest['Abs Value Compare'] = merged_portfolio_sp_latest['Ticker Share Value'] - merged_portfolio_sp_latest['SP 500 Value']
+merged_portfolio_omxh_latest['Abs Value Compare'] = merged_portfolio_omxh_latest['Ticker Share Value'] - merged_portfolio_omxh_latest['OMXH 25 Value']
 
 # This column calculates profit / loss for stock position.
-merged_portfolio_sp_latest['Stock Gain / (Loss)'] = merged_portfolio_sp_latest['Ticker Share Value'] - merged_portfolio_sp_latest['Cost Basis']
+merged_portfolio_omxh_latest['Stock Gain / (Loss)'] = merged_portfolio_omxh_latest['Ticker Share Value'] - merged_portfolio_omxh_latest['Cost Basis']
 
 # This column calculates profit / loss for SP 500.
-merged_portfolio_sp_latest['SP 500 Gain / (Loss)'] = merged_portfolio_sp_latest['SP 500 Value'] - merged_portfolio_sp_latest['Cost Basis']
-merged_portfolio_sp_latest.head()
+merged_portfolio_omxh_latest['OMXH 25 Gain / (Loss)'] = merged_portfolio_omxh_latest['OMXH 25 Value'] - merged_portfolio_omxh_latest['Cost Basis']
+merged_portfolio_omxh_latest.head()
 
 # Merge merged_portfolio_sp_latest with adj_close_start to track YTD performance
-merged_portfolio_sp_latest_YTD = pd.merge(merged_portfolio_sp_latest, adj_close_start, on = 'Ticker')
-merged_portfolio_sp_latest_YTD.head()
+merged_portfolio_omxh_latest_YTD = pd.merge(merged_portfolio_omxh_latest, adj_close_start, on = 'Ticker')
+merged_portfolio_omxh_latest_YTD.head()
 
+# Here 9.12.2020 #
+ 
 # Delete double date and rename columns
-del merged_portfolio_sp_latest_YTD['Date']
+del merged_portfolio_omxh_latest_YTD['Date']
 merged_portfolio_sp_latest_YTD.rename(columns={'Adj Close':'Ticker Start Year Close'}, inplace=True)
 merged_portfolio_sp_latest_YTD.head()
 
