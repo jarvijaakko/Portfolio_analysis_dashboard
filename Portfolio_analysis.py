@@ -6,6 +6,7 @@ Created on Fri Dec  4 23:32:41 2020
 @author: vesis
 """
 # Import necessary libraries
+# Jee jee
 import pandas as pd
 import numpy as np
 import datetime
@@ -102,7 +103,7 @@ merged_portfolio_sp.rename(columns={'Date_x':'Latest Date','Adj Close_x':'Ticker
 merged_portfolio_sp.head()
 
 # SP 500 eq shares
-merged_portfolio_sp['Equiv SP Shares'] = merged_portfolio_sp['Cost Basis'] / merged_portfolio_sp['SP 500 Initial Close']
+merged_portfolio_sp['Equiv SP Shares'] = merged_portfolio_sp[' '] / merged_portfolio_sp['SP 500 Initial Close']
 merged_portfolio_sp.head()
 
 # Merge merged_portfolio_sp with SP 500 adj_close values based on the end date
