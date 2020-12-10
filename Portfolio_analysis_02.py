@@ -26,9 +26,9 @@ yf.pdr_override()
 os.chdir('/home/vesis/Documents/Python/Portfolio_analysis')
 
 # print(__version__)
-
 init_notebook_mode(connected=True)
 
+# Read in the portfolio data
 portfolio_df = pd.read_excel('Sample stocks acquisition dates_costs_v2.xlsx')
 
 # Define the date variables
@@ -116,7 +116,7 @@ merged_portfolio_omxh_latest = pd.merge(merged_portfolio_omxh, omxh_25_adj_close
 merged_portfolio_omxh_latest.head()
 
 # Delete double Date column and rename columns
-del merged_portfolio_sp_latest['Date']
+del merged_portfolio_omxh_latest['Date']
 merged_portfolio_omxh_latest.rename(columns={'Adj Close':'OMXH 25 Latest Close'}, inplace=True)
 merged_portfolio_omxh_latest.head()
 
@@ -147,43 +147,43 @@ merged_portfolio_omxh_latest.head()
 merged_portfolio_omxh_latest_YTD = pd.merge(merged_portfolio_omxh_latest, adj_close_start, on = 'Ticker')
 merged_portfolio_omxh_latest_YTD.head()
 
-# Here 9.12.2020 #
- 
 # Delete double date and rename columns
 del merged_portfolio_omxh_latest_YTD['Date']
-merged_portfolio_sp_latest_YTD.rename(columns={'Adj Close':'Ticker Start Year Close'}, inplace=True)
-merged_portfolio_sp_latest_YTD.head()
+merged_portfolio_omxh_latest_YTD.rename(columns={'Adj Close':'Ticker Start Year Close'}, inplace=True)
+merged_portfolio_omxh_latest_YTD.head()
 
 # Merge merged_portfolio_sp_latest with adj_close_start to track SP 500 YTD performance
-merged_portfolio_sp_latest_YTD_sp = pd.merge(merged_portfolio_sp_latest_YTD, sp_500_adj_close_start, left_on = 'Start of Year', right_on = 'Date')
-merged_portfolio_sp_latest_YTD_sp.head()
+merged_portfolio_omxh_latest_YTD_omxh = pd.merge(merged_portfolio_omxh_latest_YTD, omxh_25_adj_close_start, left_on = 'Start of Year', right_on = 'Date')
+merged_portfolio_omxh_latest_YTD_omxh.head()
+
+#####
 
 # Delete double date and rename columns
-del merged_portfolio_sp_latest_YTD_sp['Date']
-merged_portfolio_sp_latest_YTD_sp.rename(columns={'Adj Close':'SP Start Year Close'}, inplace=True)
-merged_portfolio_sp_latest_YTD_sp.head()
+del merged_portfolio_omxh_latest_YTD_omxh['Date']
+merged_portfolio_omxh_latest_YTD_omxh.rename(columns={'Adj Close':'OMXH 25 Start Year Close'}, inplace=True)
+merged_portfolio_omxh_latest_YTD_omxh.head()
 
 # YTD returns
-merged_portfolio_sp_latest_YTD_sp['Share YTD'] = merged_portfolio_sp_latest_YTD_sp['Ticker Adj Close'] / merged_portfolio_sp_latest_YTD_sp['Ticker Start Year Close']-1
-merged_portfolio_sp_latest_YTD_sp['SP 500 YTD'] = merged_portfolio_sp_latest_YTD_sp['SP 500 Latest Close'] / merged_portfolio_sp_latest_YTD_sp['SP Start Year Close']-1
-merged_portfolio_sp_latest_YTD_sp.head()
+merged_portfolio_omxh_latest_YTD_omxh['Share YTD'] = merged_portfolio_omxh_latest_YTD_omxh['Ticker Adj Close'] / merged_portfolio_omxh_latest_YTD_omxh['Ticker Start Year Close']-1
+merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 YTD'] = merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 Latest Close'] / merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 Start Year Close']-1
+merged_portfolio_omxh_latest_YTD_omxh.head()
 
 # Sort by Ticker
-merged_portfolio_sp_latest_YTD_sp = merged_portfolio_sp_latest_YTD_sp.sort_values(by = 'Ticker', ascending=True)
-merged_portfolio_sp_latest_YTD_sp 
+merged_portfolio_omxh_latest_YTD_omxh = merged_portfolio_omxh_latest_YTD_omxh.sort_values(by = 'Ticker', ascending=True)
+merged_portfolio_omxh_latest_YTD_omxh
 
 # CumSum of original investment
-merged_portfolio_sp_latest_YTD_sp['Cum Invst'] = merged_portfolio_sp_latest_YTD_sp['Cost Basis'].cumsum()
+merged_portfolio_omxh_latest_YTD_omxh['Cum Invst'] = merged_portfolio_omxh_latest_YTD_omxh['Cost Basis'].cumsum()
 # CumSum of Ticker share value
-merged_portfolio_sp_latest_YTD_sp['Cum Ticker Returns'] = merged_portfolio_sp_latest_YTD_sp['Ticker Share Value'].cumsum()
+merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker Returns'] = merged_portfolio_omxh_latest_YTD_omxh['Ticker Share Value'].cumsum()
 # CumSum of SP share value
-merged_portfolio_sp_latest_YTD_sp['Cum SP Returns']  = merged_portfolio_sp_latest_YTD_sp['SP 500 Value'].cumsum()
+merged_portfolio_omxh_latest_YTD_omxh['Cum SP Returns']  = merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 Value'].cumsum()
 # Cum CoC multiple return for stock investments
-merged_portfolio_sp_latest_YTD_sp['Cum Ticker ROI Mult'] = merged_portfolio_sp_latest_YTD_sp['Cum Ticker Returns']/merged_portfolio_sp_latest_YTD_sp['Cum Invst']
+merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker ROI Mult'] = merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker Returns']/merged_portfolio_omxh_latest_YTD_omxh['Cum Invst']
 
-merged_portfolio_sp_latest_YTD_sp.head()
+merged_portfolio_omxh_latest_YTD_omxh.head()
 
-# A Little recap - the starting tables
+# A Little recap - the tables we started with
 adj_close.head()
 portfolio_df.head()
 
@@ -218,11 +218,11 @@ adj_close_pivot_merged = pd.merge(adj_close_pivot, adj_close, on = ['Ticker', 'A
 adj_close_pivot_merged.head()
 
 # Merge adj_close_pivot_merged with the master data frame
-merged_portfolio_sp_latest_YTD_sp_closing_high = pd.merge(merged_portfolio_sp_latest_YTD_sp, adj_close_pivot_merged, on = ['Ticker', 'Acquisition Date'])
-merged_portfolio_sp_latest_YTD_sp_closing_high.rename(columns={'Adj Close':'Closing High Adj Close', 'Date':'Closing High Adj Close Date'}, inplace=True)
-merged_portfolio_sp_latest_YTD_sp_closing_high['Pct off High'] = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker Adj Close']/merged_portfolio_sp_latest_YTD_sp_closing_high['Closing High Adj Close']-1
+merged_portfolio_omxh_latest_YTD_omxh_closing_high = pd.merge(merged_portfolio_omxh_latest_YTD_omxh, adj_close_pivot_merged, on = ['Ticker', 'Acquisition Date'])
+merged_portfolio_omxh_latest_YTD_omxh_closing_high.rename(columns={'Adj Close':'Closing High Adj Close', 'Date':'Closing High Adj Close Date'}, inplace=True)
+merged_portfolio_omxh_latest_YTD_omxh_closing_high['Pct off High'] = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker Adj Close']/merged_portfolio_omxh_latest_YTD_omxh_closing_high['Closing High Adj Close']-1
 
-merged_portfolio_sp_latest_YTD_sp_closing_high
+merged_portfolio_omxh_latest_YTD_omxh_closing_high
 
 # Create plots using plotly
 # Plot 1: YTD return vs SP 500 YTD
