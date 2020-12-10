@@ -156,8 +156,6 @@ merged_portfolio_omxh_latest_YTD.head()
 merged_portfolio_omxh_latest_YTD_omxh = pd.merge(merged_portfolio_omxh_latest_YTD, omxh_25_adj_close_start, left_on = 'Start of Year', right_on = 'Date')
 merged_portfolio_omxh_latest_YTD_omxh.head()
 
-#####
-
 # Delete double date and rename columns
 del merged_portfolio_omxh_latest_YTD_omxh['Date']
 merged_portfolio_omxh_latest_YTD_omxh.rename(columns={'Adj Close':'OMXH 25 Start Year Close'}, inplace=True)
@@ -172,7 +170,7 @@ merged_portfolio_omxh_latest_YTD_omxh.head()
 merged_portfolio_omxh_latest_YTD_omxh = merged_portfolio_omxh_latest_YTD_omxh.sort_values(by = 'Ticker', ascending=True)
 merged_portfolio_omxh_latest_YTD_omxh
 
-# CumSum of original investment
+# CumSum of original investments
 merged_portfolio_omxh_latest_YTD_omxh['Cum Invst'] = merged_portfolio_omxh_latest_YTD_omxh['Cost Basis'].cumsum()
 # CumSum of Ticker share value
 merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker Returns'] = merged_portfolio_omxh_latest_YTD_omxh['Ticker Share Value'].cumsum()
@@ -225,45 +223,20 @@ merged_portfolio_omxh_latest_YTD_omxh_closing_high['Pct off High'] = merged_port
 merged_portfolio_omxh_latest_YTD_omxh_closing_high
 
 # Create plots using plotly
-# Plot 1: YTD return vs SP 500 YTD
+# Plot 1: Total return vs SP 500 (taking the acq date into account = realized)
 trace1 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp['Share YTD'][0:10],
-    name = 'Ticker YTD')
-
-trace2 = go.Scatter(
-    x = merged_portfolio_sp_latest_YTD_sp['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp['SP 500 YTD'][0:10],
-    name = 'SP500 YTD')
-    
-data = [trace1, trace2]
-
-layout = go.Layout(title = 'YTD Return vs S&P 500 YTD'
-    , barmode = 'group'
-    , yaxis=dict(title='Returns', tickformat=".2%")
-    , xaxis=dict(title='Ticker')
-    , legend=dict(x=.8,y=1)
-    )
-
-fig = go.Figure(data=data, layout=layout)
-plot(fig)
-
-iplot(fig)
-
-# Plot 2: Total return vs SP 500
-trace1 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['ticker return'][0:10],
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['ticker return'][0:10],
     name = 'Ticker Total Return')
 
 trace2 = go.Scatter(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['SP Return'][0:10],
-    name = 'SP500 Total Return')
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['OMXH 25 Return'][0:10],
+    name = 'OMXH 25 Total Return')
     
 data = [trace1, trace2]
 
-layout = go.Layout(title = 'Total Return vs S&P 500'
+layout = go.Layout(title = 'Total Return vs OMXH 25'
     , barmode = 'group'
     , yaxis=dict(title='Returns', tickformat=".2%")
     , xaxis=dict(title='Ticker', tickformat=".2%")
@@ -273,20 +246,20 @@ layout = go.Layout(title = 'Total Return vs S&P 500'
 fig = go.Figure(data=data, layout=layout)
 plot(fig)
 
-# Plot 3: Cumulative return over time vs SP 500
+# Plot 2: Cumulative return over time vs OMXH 25 (Plot 2 expressed as a line)
 trace1 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['Stock Gain / (Loss)'][0:10],
-    name = 'Ticker Total Return ($)')
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Stock Gain / (Loss)'][0:10],
+    name = 'Ticker Total Return (Local currency)')
 
 trace2 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['SP 500 Gain / (Loss)'][0:10],
-    name = 'SP 500 Total Return ($)')
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['OMXH 25 Gain / (Loss)'][0:10],
+    name = 'OMXH 25 Total Return (Local currency)')
 
 trace3 = go.Scatter(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['ticker return'][0:10],
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['ticker return'][0:10],
     name = 'Ticker Total Return %',
     yaxis='y2')
 
@@ -294,8 +267,8 @@ data = [trace1, trace2, trace3]
 
 layout = go.Layout(title = 'Gain / (Loss) Total Return vs S&P 500'
     , barmode = 'group'
-    , yaxis=dict(title='Gain / (Loss) ($)')
-    , yaxis2=dict(title='Ticker Return', overlaying='y', side='right', tickformat=".2%")
+    , yaxis=dict(title='Gain / (Loss) (Local currency)')
+    , yaxis2=dict(title='Ticker Return (%)', overlaying='y', side='right', tickformat=".2%")
     , xaxis=dict(title='Ticker')
     , legend=dict(x=.75,y=1)
     )
@@ -303,32 +276,31 @@ layout = go.Layout(title = 'Gain / (Loss) Total Return vs S&P 500'
 fig = go.Figure(data=data, layout=layout)
 plot(fig)
 
-# Plot 4: Cum investments over time and returns 
+# Plot 3: Cum investments over time and returns 
 trace1 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['Cum Invst'],
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum Invst'],
     # mode = 'lines+markers',
     name = 'Cum Invst')
 
 trace2 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['Cum SP Returns'],
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum SP Returns'],
     # mode = 'lines+markers',
-    name = 'Cum SP500 Returns')
+    name = 'Cum OMXH 25 Returns')
 
 trace3 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['Cum Ticker Returns'],
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum Ticker Returns'],
     # mode = 'lines+markers',
     name = 'Cum Ticker Returns')
 
 trace4 = go.Scatter(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['Cum Ticker ROI Mult'],
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum Ticker ROI Mult'],
     # mode = 'lines+markers',
     name = 'Cum ROI  Mult'
     , yaxis='y2')
-
 
 data = [trace1, trace2, trace3, trace4]
 
@@ -343,10 +315,35 @@ layout = go.Layout(title = 'Total Cumulative Investments Over Time'
 fig = go.Figure(data=data, layout=layout)
 plot(fig)
 
+# This might be informative to order by the acquisition date to see 'real-life' ROI
+
+# Plot 4: YTD return vs SP 500 YTD (not taking into account the acq date = hypothetical)
+trace1 = go.Bar(
+    x = merged_portfolio_omxh_latest_YTD_omxh['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh['Share YTD'][0:10],
+    name = 'Ticker YTD')
+
+trace2 = go.Scatter(
+    x = merged_portfolio_omxh_latest_YTD_omxh['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 YTD'][0:10],
+    name = 'OMXH 25 YTD')
+    
+data = [trace1, trace2]
+
+layout = go.Layout(title = 'YTD Return vs OMXH 25 YTD'
+    , barmode = 'group'
+    , yaxis=dict(title='Returns', tickformat=".2%")
+    , xaxis=dict(title='Ticker')
+    , legend=dict(x=.8,y=1)
+    )
+
+fig = go.Figure(data=data, layout=layout)
+plot(fig)
+
 # Plot 5: Current share price vs closing high since purchased
 trace1 = go.Bar(
-    x = merged_portfolio_sp_latest_YTD_sp_closing_high['Ticker'][0:10],
-    y = merged_portfolio_sp_latest_YTD_sp_closing_high['Pct off High'][0:10],
+    x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Pct off High'][0:10],
     name = 'Pct off High')
     
 data = [trace1]
