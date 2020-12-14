@@ -285,7 +285,7 @@ trace1 = go.Bar(
 
 trace2 = go.Bar(
     x = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
-    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum SP Returns'],
+    y = merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum OMXH Returns'],
     # mode = 'lines+markers',
     name = 'Cum OMXH 25 Returns')
 
