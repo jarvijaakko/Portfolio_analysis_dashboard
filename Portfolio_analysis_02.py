@@ -175,7 +175,7 @@ merged_portfolio_omxh_latest_YTD_omxh['Cum Invst'] = merged_portfolio_omxh_lates
 # CumSum of Ticker share value
 merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker Returns'] = merged_portfolio_omxh_latest_YTD_omxh['Ticker Share Value'].cumsum()
 # CumSum of SP share value
-merged_portfolio_omxh_latest_YTD_omxh['Cum SP Returns']  = merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 Value'].cumsum()
+merged_portfolio_omxh_latest_YTD_omxh['Cum OMXH Returns']  = merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 Value'].cumsum()
 # Cum CoC multiple return for stock investments
 merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker ROI Mult'] = merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker Returns']/merged_portfolio_omxh_latest_YTD_omxh['Cum Invst']
 
@@ -357,3 +357,131 @@ layout = go.Layout(title = 'Adj Close % off of High'
 
 fig = go.Figure(data=data, layout=layout)
 plot(fig)
+
+# Stock returns comparisons
+chart_tickers = portfolio_df['Ticker'].unique()
+chart_tickers = chart_tickers.tolist()
+chart_tickers.append('^OMXH25')
+chart_tickers = np.array(chart_tickers)
+chart_tickers
+
+chart_start = datetime.datetime(2020, 1, 10)
+chart_end = datetime.datetime(2020, 7, 13)
+
+chart_data = get(chart_tickers, chart_start, chart_end)
+chart_data.head()
+
+chart_data_eval = chart_data[['Close']]
+chart_data_eval.reset_index(inplace=True)
+
+chart_data_eval_pivot = pd.pivot_table(chart_data_eval, index='Date', columns='Ticker', values='Close')
+chart_data_eval_pivot.reset_index(inplace=True)
+
+# Plot X
+trace1 = go.Scatter(
+    x = chart_data_eval_pivot['Date'],
+    y = chart_data_eval_pivot['^OMXH25'],
+    mode = 'lines',
+    name = 'SP Prices')
+
+trace2 = go.Scatter(
+    x = chart_data_eval_pivot['Date'],
+    y = chart_data_eval_pivot['QCOM'],
+    mode = 'lines',
+    name = 'AAPL Returns')
+
+trace3 = go.Scatter(
+    x = chart_data_eval_pivot['Date'],
+    y = chart_data_eval_pivot['HLAG.DE'],
+    mode = 'lines',
+    name = 'NFLX Returns')
+
+data = [trace1, trace2, trace3]
+
+layout = go.Layout(title = 'Share Price Returns by Ticker'
+    , barmode = 'group'
+    , yaxis=dict(title='Returns')
+    , xaxis=dict(title='Ticker')
+    , legend=dict(x=1,y=1)
+    )
+
+fig = go.Figure(data=data, layout=layout)
+plot(fig)
+
+chart_data_eval_pivot_relative = pd.pivot_table(chart_data_eval, index='Date', columns='Ticker', values = 'Close')
+
+# Own addition since there are different time-zones across the markets in Fin, Ger and USA
+chart_data_eval_pivot_relative.drop(chart_data_eval_pivot_relative.index[0], inplace=True)
+
+chart_data_eval_pivot_relative_first = chart_data_eval_pivot_relative.iloc[0,:]
+
+chart_data_eval_pivot_relative = (chart_data_eval_pivot_relative.divide(chart_data_eval_pivot_relative_first, axis=1))-1
+
+chart_data_eval_pivot_relative.reset_index(inplace=True)
+
+# Plot Y
+trace1 = go.Scatter(
+    x = chart_data_eval_pivot_relative['Date'],
+    y = chart_data_eval_pivot_relative['^OMXH25'],
+    mode = 'lines',
+    name = 'SP Return')
+
+trace2 = go.Scatter(
+    x = chart_data_eval_pivot_relative['Date'],
+    y = chart_data_eval_pivot_relative['HLAG.DE'],
+    mode = 'lines',
+    name = 'AAPL Return')
+
+trace3 = go.Scatter(
+    x = chart_data_eval_pivot_relative['Date'],
+    y = chart_data_eval_pivot_relative['QCOM'],
+    mode = 'lines',
+    name = 'NFLX Return')
+
+trace4 = go.Scatter(
+    x = chart_data_eval_pivot_relative['Date'],
+    y = chart_data_eval_pivot_relative['REG1V.HE'],
+    mode = 'lines',
+    name = 'MTCH Return')
+
+data = [trace1, trace2, trace3, trace4]
+
+layout = go.Layout(title = 'Return Comparisons by Ticker'
+    , barmode = 'group'
+    , yaxis=dict(title='Relative Returns', tickformat=".1%")
+    , xaxis=dict(title='Ticker')
+    , legend=dict(x=1,y=1)
+    )
+
+fig = go.Figure(data=data, layout=layout)
+plot(fig)
+
+# Data outputs
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high[['Ticker']]
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.drop_duplicates(['Ticker'], keep='first')
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers['Ticker'].unique()
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.tolist()
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.append('OMXH25')
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = pd.DataFrame(data=merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers, columns=['Ticker'])
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.sort_values(by='Ticker', ascending=True, inplace=True)
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.head()
+
+# Write to file
+os.getcwd() # Check the home directory
+merged_portfolio_omxh_latest_YTD_omxh_closing_high.to_csv('analyzed_portfolio.csv')
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.to_csv('tickers.csv')
+
+# Create tickers to be used in the dashboard's dropdown
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers['Ticker'].unique()
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.tolist()
+
+merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers
+
