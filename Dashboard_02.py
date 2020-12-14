@@ -120,6 +120,117 @@ app.layout = html.Div([
                                                             yaxis = {'title':'Returns', 'tickformat':".2%"}
                                          )}, style={'width': '50%', 'display':'inline-block'}
                                         ),
+				dcc.Markdown(''' --- '''),
+                
+				# Cumulative Returns Over Time section
+				html.H1('Cumulative Returns per Position Over Time'),
+					dcc.Graph(id='crot1',
+                                        figure = {'data':[
+                                                go.Bar(
+    											x = data['Ticker'][0:20],
+    											y = data['Stock Gain / (Loss)'][0:20],
+    											name = 'Ticker Total Return (Local currency)'),
+    											go.Bar(
+											    x = data['Ticker'][0:20],
+											    y = data['OMXH 25 Gain / (Loss)'][0:20],
+											    name = 'OMXH 25 Total Return (Local currenry)'),
+											    go.Scatter(
+    											x = data['Ticker'][0:20],
+											    y = data['ticker return'][0:20],
+											    name = 'Ticker Total Return %',
+											    yaxis='y2')
+		                                        ],
+                                        'layout':go.Layout(title='Gain / (Loss) and Total Return vs OMXH 25',
+                                        					barmode='group', 
+                                                            xaxis = {'title': 'Ticker'},
+                                                            yaxis = {'title': 'Gain / (Loss) (Local currency)'},
+                                                            yaxis2 = {'title':'Ticker Return', 'overlaying':'y', 'side':'right', 'tickformat':".1%"},
+                                                            #legend = {'x':'0.75', 'y':'1.2'}
+                                         )}, style={'width': '100%'}
+                                        ),
+				dcc.Markdown(''' --- '''),
+                
+                # Total Cumulative Investments Over Time section
+				html.H1('Total Cumulative Investments by Portfolio Over Time'),
+					dcc.Graph(id='tcot1',
+                                        figure = {'data':[
+                                                go.Scatter(
+    											x = data['Ticker'],
+    											y = data['Cum Invst'],
+    											mode = 'lines+markers',
+    											name = 'Cum Invst'),
+    											go.Scatter(
+											    x = data['Ticker'],
+											    y = data['Cum Ticker Returns'],
+											    mode = 'lines+markers',
+											    name = 'Cum Ticker Returns'),
+											    go.Scatter(
+    											x = data['Ticker'],
+											    y = data['Cum OMXH Returns'],
+											    mode = 'lines+markers',	
+											    name = 'Cum OMXH 25 Returns'
+											    )
+		                                        ],
+                                        'layout':go.Layout(title='Cumulative Investment Returns',
+                                        					barmode='group', 
+                                                            xaxis = {'title': 'Ticker'},
+                                                            yaxis = {'title': 'Returns'},
+                                                            #legend = {'x':'1', 'y':'1'}
+                                         )}, style={'width': '100%'}
+                                        ),
+					dcc.Graph(id='tcot2',
+                                        figure = {'data':[
+                                                go.Bar(
+											    x = data['Ticker'],
+											    y = data['Cum Invst'],
+											    name = 'Cum Invst'),
+    											go.Bar(
+											    x = data['Ticker'],
+											    y = data['Cum OMXH Returns'],
+											    name = 'Cum OMXH 25 Returns'),
+											    go.Bar(
+											    x = data['Ticker'],
+											    y = data['Cum Ticker Returns'],
+											    name = 'Cum Ticker Returns'),
+											    go.Scatter(
+											    x = data['Ticker'],
+											    y = data['Cum Ticker ROI Mult'],
+											    name = 'Cum ROI Mult'
+											    , yaxis='y2'
+											    )
+		                                        ],
+                                        'layout':go.Layout(title='Total Cumulative Investments | ROI Multiple, Over Time',
+                                        					barmode='group', 
+                                                            xaxis = {'title': 'Ticker'},
+                                                            yaxis = {'title': 'Returns'},
+                                                            yaxis2 = {'title':'Cum ROI Mult', 'overlaying':'y', 'side':'right'},
+                                                            #legend = {'x':'0.75', 'y':'1.2'}
+                                         )}, style={'width': '100%'}
+                                        ),
+					dcc.Markdown(''' --- '''),
+                    # Current Share Price versus Closing High Since Purchased
+					html.H1('Current Share Price versus Closing High Since Purchased'),
+					dcc.Graph(id='cvh1',
+                                        figure = {'data':[
+                                                go.Bar(
+    											x = data['Ticker'][0:20],
+    											y = data['Pct off High'][0:20],
+    											name = 'Pct off High'),
+    											go.Scatter(
+    											x = data['Ticker'][0:20],
+    											y = [-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25],
+    											mode='lines',
+    											name='Trailing Stop Marker',
+    											line = {'color':'red'}
+    											)
+		                                        ],
+                                        'layout':go.Layout(title='Adj Close % off of High Since Purchased',
+                                        					barmode='group', 
+                                                            xaxis = {'title': 'Ticker'},
+                                                            yaxis = {'title': '% Below High Since Purchased', 'tickformat':'.2%'},
+                                                            #legend = {'x':'0.8', 'y':'1.2'}
+                                         )}, style={'width': '100%'}
+                                        ),
 				dcc.Markdown(''' --- ''')
 ])
 
