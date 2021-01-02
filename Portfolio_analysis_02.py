@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec  4 23:32:41 2020
+# Elaborated based on the wonderful tutorial by Kevin Boller (https://towardsdatascience.com/python-for-finance-stock-portfolio-analyses-6da4c3e61054)
 
-@author: vesis
-"""
 # Import necessary libraries
 import pandas as pd
 import numpy as np
@@ -29,9 +24,10 @@ os.chdir('/home/vesis/Documents/Python/Portfolio_analysis')
 init_notebook_mode(connected=True)
 
 # Read in the portfolio data
-portfolio_df = pd.read_excel('Sample stocks acquisition dates_costs_v2.xlsx')
+portfolio_df = pd.read_excel('Sample stocks acquisition dates_costs_v3.xls')
 
 # Define the date variables
+# Make a function (!!!)
 start_omxh = datetime.datetime(2019, 12, 29)
 end_omxh = datetime.datetime(2020, 12, 7)
 end_of_last_year = datetime.datetime(2019, 12, 30)
@@ -58,6 +54,7 @@ omxh_25_adj_close_start = omxh_25_adj_close[omxh_25_adj_close['Date'] == end_of_
 tickers = portfolio_df['Ticker'].unique()
 
 # Function for pulling the ticker data
+# Make function (!!!)
 def get(tickers, startdate, enddate):
     def data(ticker):
         return(pdr.get_data_yahoo(ticker, start = startdate, end = enddate))
@@ -87,7 +84,7 @@ adj_close_latest.head()
 portfolio_df.set_index(['Ticker'], inplace=True)
 portfolio_df.head()
 
-# Merge portfolio_df with adj_close 
+# Merge portfolio_df with adj_close
 merged_portfolio = pd.merge(portfolio_df, adj_close_latest, left_index=True, right_index=True)
 merged_portfolio.head(10)
 
@@ -121,29 +118,29 @@ merged_portfolio_omxh_latest.rename(columns={'Adj Close':'OMXH 25 Latest Close'}
 merged_portfolio_omxh_latest.head()
 
 # Define a bunch of columns
-# Percent return of SP from acquisition date of position through latest trading day.
+# Percent return of OMXH from acquisition date of position through latest trading day.
 merged_portfolio_omxh_latest['OMXH 25 Return'] = merged_portfolio_omxh_latest['OMXH 25 Latest Close'] / merged_portfolio_omxh_latest['OMXH 25 Initial Close'] - 1
 
-# This is a new column which takes the tickers return and subtracts the sp 500 equivalent range return.
+# This is a new column which takes the tickers return and subtracts the OMXH equivalent range return.
 merged_portfolio_omxh_latest['Abs. Return Compare'] = merged_portfolio_omxh_latest['ticker return'] - merged_portfolio_omxh_latest['OMXH 25 Return']
 
 # This is a new column where we calculate the ticker's share value by multiplying the original quantity by the latest close.
 merged_portfolio_omxh_latest['Ticker Share Value'] = merged_portfolio_omxh_latest['Quantity'] * merged_portfolio_omxh_latest['Ticker Adj Close']
 
-# We calculate the equivalent SP 500 Value if we take the original SP shares * the latest SP 500 share price.
+# We calculate the equivalent OMXH value if we take the original OMXH shares * the latest OMXH share price.
 merged_portfolio_omxh_latest['OMXH 25 Value'] = merged_portfolio_omxh_latest['Equiv OMXH Shares'] * merged_portfolio_omxh_latest['OMXH 25 Latest Close']
 
-# This is a new column where we take the current market value for the shares and subtract the SP 500 value.
+# This is a new column where we take the current market value for the shares and subtract the OMXH value.
 merged_portfolio_omxh_latest['Abs Value Compare'] = merged_portfolio_omxh_latest['Ticker Share Value'] - merged_portfolio_omxh_latest['OMXH 25 Value']
 
 # This column calculates profit / loss for stock position.
 merged_portfolio_omxh_latest['Stock Gain / (Loss)'] = merged_portfolio_omxh_latest['Ticker Share Value'] - merged_portfolio_omxh_latest['Cost Basis']
 
-# This column calculates profit / loss for SP 500.
+# This column calculates profit / loss for OMXH.
 merged_portfolio_omxh_latest['OMXH 25 Gain / (Loss)'] = merged_portfolio_omxh_latest['OMXH 25 Value'] - merged_portfolio_omxh_latest['Cost Basis']
 merged_portfolio_omxh_latest.head()
 
-# Merge merged_portfolio_sp_latest with adj_close_start to track YTD performance
+# Merge merged_portfolio_omxh_latest with adj_close_start to track YTD performance
 merged_portfolio_omxh_latest_YTD = pd.merge(merged_portfolio_omxh_latest, adj_close_start, on = 'Ticker')
 merged_portfolio_omxh_latest_YTD.head()
 
@@ -152,7 +149,7 @@ del merged_portfolio_omxh_latest_YTD['Date']
 merged_portfolio_omxh_latest_YTD.rename(columns={'Adj Close':'Ticker Start Year Close'}, inplace=True)
 merged_portfolio_omxh_latest_YTD.head()
 
-# Merge merged_portfolio_sp_latest with adj_close_start to track SP 500 YTD performance
+# Merge merged_portfolio_sp_latest with adj_close_start to track OMXH YTD performance
 merged_portfolio_omxh_latest_YTD_omxh = pd.merge(merged_portfolio_omxh_latest_YTD, omxh_25_adj_close_start, left_on = 'Start of Year', right_on = 'Date')
 merged_portfolio_omxh_latest_YTD_omxh.head()
 
@@ -174,7 +171,7 @@ merged_portfolio_omxh_latest_YTD_omxh
 merged_portfolio_omxh_latest_YTD_omxh['Cum Invst'] = merged_portfolio_omxh_latest_YTD_omxh['Cost Basis'].cumsum()
 # CumSum of Ticker share value
 merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker Returns'] = merged_portfolio_omxh_latest_YTD_omxh['Ticker Share Value'].cumsum()
-# CumSum of SP share value
+# CumSum of OMXH share value
 merged_portfolio_omxh_latest_YTD_omxh['Cum OMXH Returns']  = merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 Value'].cumsum()
 # Cum CoC multiple return for stock investments
 merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker ROI Mult'] = merged_portfolio_omxh_latest_YTD_omxh['Cum Ticker Returns']/merged_portfolio_omxh_latest_YTD_omxh['Cum Invst']
@@ -265,7 +262,7 @@ trace3 = go.Scatter(
 
 data = [trace1, trace2, trace3]
 
-layout = go.Layout(title = 'Gain / (Loss) Total Return vs S&P 500'
+layout = go.Layout(title = 'Gain / (Loss) Total Return vs OMXH 25'
     , barmode = 'group'
     , yaxis=dict(title='Gain / (Loss) (Local currency)')
     , yaxis2=dict(title='Ticker Return (%)', overlaying='y', side='right', tickformat=".2%")
@@ -317,7 +314,7 @@ plot(fig)
 
 # This might be informative to order by the acquisition date to see 'real-life' ROI
 
-# Plot 4: YTD return vs SP 500 YTD (not taking into account the acq date = hypothetical)
+# Plot 4: YTD return vs OMXH YTD (not taking into account the acq date = hypothetical)
 trace1 = go.Bar(
     x = merged_portfolio_omxh_latest_YTD_omxh['Ticker'][0:10],
     y = merged_portfolio_omxh_latest_YTD_omxh['Share YTD'][0:10],
@@ -382,21 +379,27 @@ trace1 = go.Scatter(
     x = chart_data_eval_pivot['Date'],
     y = chart_data_eval_pivot['^OMXH25'],
     mode = 'lines',
-    name = 'SP Prices')
+    name = 'OMXH Prices')
 
 trace2 = go.Scatter(
     x = chart_data_eval_pivot['Date'],
     y = chart_data_eval_pivot['QCOM'],
     mode = 'lines',
-    name = 'AAPL Returns')
+    name = 'Qualcomm Returns')
 
 trace3 = go.Scatter(
     x = chart_data_eval_pivot['Date'],
-    y = chart_data_eval_pivot['HLAG.DE'],
+    y = chart_data_eval_pivot['REG1V.HE'],
     mode = 'lines',
-    name = 'NFLX Returns')
+    name = 'Revenio Returns')
 
-data = [trace1, trace2, trace3]
+trace4 = go.Scatter(
+    x = chart_data_eval_pivot['Date'],
+    y = chart_data_eval_pivot['ABB.ST'],
+    mode = 'lines',
+    name = 'ABB Returns')
+
+data = [trace1, trace2, trace3, trace4]
 
 layout = go.Layout(title = 'Share Price Returns by Ticker'
     , barmode = 'group'
@@ -424,25 +427,25 @@ trace1 = go.Scatter(
     x = chart_data_eval_pivot_relative['Date'],
     y = chart_data_eval_pivot_relative['^OMXH25'],
     mode = 'lines',
-    name = 'SP Return')
+    name = 'OMXH Return')
 
 trace2 = go.Scatter(
     x = chart_data_eval_pivot_relative['Date'],
-    y = chart_data_eval_pivot_relative['HLAG.DE'],
+    y = chart_data_eval_pivot_relative['ABB.ST'],
     mode = 'lines',
-    name = 'AAPL Return')
+    name = 'ABB Return')
 
 trace3 = go.Scatter(
     x = chart_data_eval_pivot_relative['Date'],
     y = chart_data_eval_pivot_relative['QCOM'],
     mode = 'lines',
-    name = 'NFLX Return')
+    name = 'Qualcomm Return')
 
 trace4 = go.Scatter(
     x = chart_data_eval_pivot_relative['Date'],
     y = chart_data_eval_pivot_relative['REG1V.HE'],
     mode = 'lines',
-    name = 'MTCH Return')
+    name = 'Revenio Return')
 
 data = [trace1, trace2, trace3, trace4]
 

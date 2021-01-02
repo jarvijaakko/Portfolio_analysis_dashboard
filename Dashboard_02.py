@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Dec 14 19:57:43 2020
+# Elaborated based on the wonderful tutorial by Kevin Boller (https://towardsdatascience.com/python-for-finance-dash-by-plotly-ccf84045b8be)
 
-@author: vesis
-"""
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
