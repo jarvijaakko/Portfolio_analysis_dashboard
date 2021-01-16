@@ -15,7 +15,10 @@ import os
 # Working directory
 os.chdir('/home/vesis/Documents/Python/Portfolio_analysis')
 
-app = dash.Dash()
+# Define the external CSS stylesheet to be used
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(external_stylesheets = external_stylesheets)
 
 tickers = pd.read_csv('tickers.csv')
 tickers.set_index('Ticker', inplace=True)
@@ -228,6 +231,11 @@ app.layout = html.Div([
                                         ),
 				dcc.Markdown(''' --- ''')
 ])
+
+# Append the external CSS stylesheet
+app.css.append_css({
+	'external_url' : 'https://codepen.io/chriddyp/pen/bWLwgP.css'
+})
 
 @app.callback(Output('my_graph', 'figure'),
 				[Input('submit-button', 'n_clicks')],
