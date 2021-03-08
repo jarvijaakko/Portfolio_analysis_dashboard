@@ -153,8 +153,8 @@ merged_portfolio['OMXH25 YTD Return'] = merged_portfolio['OMXH25 Latest Close'] 
 # YTD loppuu
 
 # CUMULATIVE SUMS
-# Sort rows by Ticker
-merged_portfolio = merged_portfolio.sort_values(by='Ticker', ascending=True)
+# Sort rows by Acquisition Date
+merged_portfolio = merged_portfolio.sort_values(by='Acquisition Date', ascending=False)
 
 # CumSum of original investments
 merged_portfolio['Cum Investments'] = merged_portfolio['Cost Basis'].cumsum()
@@ -215,248 +215,171 @@ print(merged_portfolio)
 # HIGHEST VALUE loppuu
 
 # PLOTS WITH PLOTLY
-# Plot 1: Total return vs SP 500 (taking the acq date into account = realized)
-# trace1 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['ticker return'][0:10],
-#     name='Ticker Total Return')
-# 
-# trace2 = go.Scatter(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['OMXH 25 Return'][0:10],
-#     name='OMXH 25 Total Return')
-# 
-# data = [trace1, trace2]
-# 
-# layout = go.Layout(title='Total Return vs OMXH 25'
-#                    , barmode='group'
-#                    , yaxis=dict(title='Returns', tickformat=".2%")
-#                    , xaxis=dict(title='Ticker', tickformat=".2%")
-#                    , legend=dict(x=.8, y=1)
-#                    )
-# 
-# fig = go.Figure(data=data, layout=layout)
-# plot(fig)
-# 
-# # Plot 2: Cumulative return over time vs OMXH 25 (Plot 2 expressed as a line)
-# trace1 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Stock Gain / (Loss)'][0:10],
-#     name='Ticker Total Return (Local currency)')
-# 
-# trace2 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['OMXH 25 Gain / (Loss)'][0:10],
-#     name='OMXH 25 Total Return (Local currency)')
-# 
-# trace3 = go.Scatter(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['ticker return'][0:10],
-#     name='Ticker Total Return %',
-#     yaxis='y2')
-# 
-# data = [trace1, trace2, trace3]
-# 
-# layout = go.Layout(title='Gain / (Loss) Total Return vs OMXH 25'
-#                    , barmode='group'
-#                    , yaxis=dict(title='Gain / (Loss) (Local currency)')
-#                    , yaxis2=dict(title='Ticker Return (%)', overlaying='y', side='right', tickformat=".2%")
-#                    , xaxis=dict(title='Ticker')
-#                    , legend=dict(x=.75, y=1)
-#                    )
-# 
-# fig = go.Figure(data=data, layout=layout)
-# plot(fig)
-# 
-# # Plot 3: Cum investments over time and returns 
-# trace1 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum Invst'],
-#     # mode = 'lines+markers',
-#     name='Cum Invst')
-# 
-# trace2 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum OMXH Returns'],
-#     # mode = 'lines+markers',
-#     name='Cum OMXH 25 Returns')
-# 
-# trace3 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum Ticker Returns'],
-#     # mode = 'lines+markers',
-#     name='Cum Ticker Returns')
-# 
-# trace4 = go.Scatter(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Cum Ticker ROI Mult'],
-#     # mode = 'lines+markers',
-#     name='Cum ROI  Mult'
-#     , yaxis='y2')
-# 
-# data = [trace1, trace2, trace3, trace4]
-# 
-# layout = go.Layout(title='Total Cumulative Investments Over Time'
-#                    , barmode='group'
-#                    , yaxis=dict(title='Returns')
-#                    , xaxis=dict(title='Ticker')
-#                    , legend=dict(x=.4, y=1)
-#                    , yaxis2=dict(title='Cum ROI Mult', overlaying='y', side='right')
-#                    )
-# 
-# fig = go.Figure(data=data, layout=layout)
-# plot(fig)
-# 
-# # This might be informative to order by the acquisition date to see 'real-life' ROI
-# 
-# # Plot 4: YTD return vs OMXH YTD (not taking into account the acq date = hypothetical)
-# trace1 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh['Share YTD'][0:10],
-#     name='Ticker YTD')
-# 
-# trace2 = go.Scatter(
-#     x=merged_portfolio_omxh_latest_YTD_omxh['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh['OMXH 25 YTD'][0:10],
-#     name='OMXH 25 YTD')
-# 
-# data = [trace1, trace2]
-# 
-# layout = go.Layout(title='YTD Return vs OMXH 25 YTD'
-#                    , barmode='group'
-#                    , yaxis=dict(title='Returns', tickformat=".2%")
-#                    , xaxis=dict(title='Ticker')
-#                    , legend=dict(x=.8, y=1)
-#                    )
-# 
-# fig = go.Figure(data=data, layout=layout)
-# plot(fig)
-# 
-# # Plot 5: Current share price vs closing high since purchased
-# trace1 = go.Bar(
-#     x=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Ticker'][0:10],
-#     y=merged_portfolio_omxh_latest_YTD_omxh_closing_high['Pct off High'][0:10],
-#     name='Pct off High')
-# 
-# data = [trace1]
-# 
-# layout = go.Layout(title='Adj Close % off of High'
-#                    , barmode='group'
-#                    , yaxis=dict(title='% Below Adj Close High', tickformat=".2%")
-#                    , xaxis=dict(title='Ticker')
-#                    , legend=dict(x=.8, y=1)
-#                    )
-# 
-# fig = go.Figure(data=data, layout=layout)
-# plot(fig)
-# 
-# # Stock returns comparisons
-# chart_tickers = portfolio_df['Ticker'].unique()
-# chart_tickers = chart_tickers.tolist()
-# chart_tickers.append('^OMXH25')
-# chart_tickers = np.array(chart_tickers)
-# chart_tickers
-# 
-# chart_start = datetime.datetime(2020, 1, 10)
-# chart_end = datetime.datetime(2020, 7, 13)
-# 
-# chart_data = get(chart_tickers, chart_start, chart_end)
-# chart_data.head()
-# 
-# chart_data_eval = chart_data[['Close']]
-# chart_data_eval.reset_index(inplace=True)
-# 
-# chart_data_eval_pivot = pd.pivot_table(chart_data_eval, index='Date', columns='Ticker', values='Close')
-# chart_data_eval_pivot.reset_index(inplace=True)
-# 
-# # Plot X
-# trace1 = go.Scatter(
-#     x=chart_data_eval_pivot['Date'],
-#     y=chart_data_eval_pivot['^OMXH25'],
-#     mode='lines',
-#     name='OMXH Prices')
-# 
-# trace2 = go.Scatter(
-#     x=chart_data_eval_pivot['Date'],
-#     y=chart_data_eval_pivot['QCOM'],
-#     mode='lines',
-#     name='Qualcomm Returns')
-# 
-# trace3 = go.Scatter(
-#     x=chart_data_eval_pivot['Date'],
-#     y=chart_data_eval_pivot['REG1V.HE'],
-#     mode='lines',
-#     name='Revenio Returns')
-# 
-# trace4 = go.Scatter(
-#     x=chart_data_eval_pivot['Date'],
-#     y=chart_data_eval_pivot['ABB.ST'],
-#     mode='lines',
-#     name='ABB Returns')
-# 
-# data = [trace1, trace2, trace3, trace4]
-# 
-# layout = go.Layout(title='Share Price Returns by Ticker'
-#                    , barmode='group'
-#                    , yaxis=dict(title='Returns')
-#                    , xaxis=dict(title='Ticker')
-#                    , legend=dict(x=1, y=1)
-#                    )
-# 
-# fig = go.Figure(data=data, layout=layout)
-# plot(fig)
-# 
-# chart_data_eval_pivot_relative = pd.pivot_table(chart_data_eval, index='Date', columns='Ticker', values='Close')
-# 
-# # Own addition since there are different time-zones across the markets in Fin, Ger and USA
-# chart_data_eval_pivot_relative.drop(chart_data_eval_pivot_relative.index[0], inplace=True)
-# 
-# chart_data_eval_pivot_relative_first = chart_data_eval_pivot_relative.iloc[0, :]
-# 
-# chart_data_eval_pivot_relative = (chart_data_eval_pivot_relative.divide(chart_data_eval_pivot_relative_first,
-#                                                                         axis=1)) - 1
-# 
-# chart_data_eval_pivot_relative.reset_index(inplace=True)
-# 
-# # Plot Y
-# trace1 = go.Scatter(
-#     x=chart_data_eval_pivot_relative['Date'],
-#     y=chart_data_eval_pivot_relative['^OMXH25'],
-#     mode='lines',
-#     name='OMXH Return')
-# 
-# trace2 = go.Scatter(
-#     x=chart_data_eval_pivot_relative['Date'],
-#     y=chart_data_eval_pivot_relative['ABB.ST'],
-#     mode='lines',
-#     name='ABB Return')
-# 
-# trace3 = go.Scatter(
-#     x=chart_data_eval_pivot_relative['Date'],
-#     y=chart_data_eval_pivot_relative['QCOM'],
-#     mode='lines',
-#     name='Qualcomm Return')
-# 
-# trace4 = go.Scatter(
-#     x=chart_data_eval_pivot_relative['Date'],
-#     y=chart_data_eval_pivot_relative['REG1V.HE'],
-#     mode='lines',
-#     name='Revenio Return')
-# 
-# data = [trace1, trace2, trace3, trace4]
-# 
-# layout = go.Layout(title='Return Comparisons by Ticker'
-#                    , barmode='group'
-#                    , yaxis=dict(title='Relative Returns', tickformat=".1%")
-#                    , xaxis=dict(title='Ticker')
-#                    , legend=dict(x=1, y=1)
-#                    )
-# 
-# fig = go.Figure(data=data, layout=layout)
-# plot(fig)
-# 
-# # PLOTS WITH PLOTLY loppuu
-# 
+# Plot 1: Ticker return over time vs OMXH 25 (in local currency and percentage)
+trace1 = go.Bar(
+    x=merged_portfolio['Ticker'][0:10],
+    y=merged_portfolio['Stock Gain / Loss'][0:10],
+    name='Ticker Total Return (Local currency)')
+
+trace2 = go.Bar(
+    x=merged_portfolio['Ticker'][0:10],
+    y=merged_portfolio['OMXH25 Gain / Loss'][0:10],
+    name='OMXH 25 Total Return (Local currency)')
+
+trace3 = go.Scatter(
+    x=merged_portfolio['Ticker'][0:10],
+    y=merged_portfolio['ticker return'][0:10],
+    name='Ticker Total Return (in %)',
+    yaxis='y2')
+
+trace4 = go.Scatter(
+    x=merged_portfolio['Ticker'][0:10],
+    y=merged_portfolio['OMXH25 Return'][0:10],
+    name='OMXH 25 Total Return (in %)',
+    yaxis='y2')
+
+
+data = [trace1, trace2, trace3, trace4]
+
+layout = go.Layout(title='Total Return vs OMXH 25'
+                   , barmode='group'
+                   , yaxis=dict(title='Gain / Loss (Local currency)')
+                   , yaxis2=dict(title='Return (%)', overlaying='y', side='right', tickformat=".2%")
+                   , xaxis=dict(title='Ticker')
+                   , legend=dict(x=.75, y=1)
+                   )
+
+fig_1 = go.Figure(data=data, layout=layout)
+plot(fig_1)
+
+# Plot 2: Cum investments and returns over time
+trace1 = go.Bar(
+    x=merged_portfolio['Ticker'],
+    y=merged_portfolio['Cum Investments'],
+    # mode = 'lines+markers',
+    name='Cum Investments')
+
+trace2 = go.Bar(
+    x=merged_portfolio['Ticker'],
+    y=merged_portfolio['Cum Ticker Returns'],
+    # mode = 'lines+markers',
+    name='Cum Ticker Returns')
+
+trace3 = go.Scatter(
+    x=merged_portfolio['Ticker'],
+    y=merged_portfolio['Cum Ticker ROI Mult'],
+    # mode = 'lines+markers',
+    name='Cum ROI  Mult'
+    , yaxis='y2')
+
+data = [trace1, trace2, trace3]
+
+layout = go.Layout(title='Total Cumulative Investments Over Time'
+                   , barmode='group'
+                   , yaxis=dict(title='Returns')
+                   , xaxis=dict(title='Ticker')
+                   , legend=dict(x=.4, y=1)
+                   , yaxis2=dict(title='Cum ROI Mult', overlaying='y', side='right')
+                   )
+
+fig = go.Figure(data=data, layout=layout)
+plot(fig)
+
+# This might be informative to order by the acquisition date to see 'real-life' ROI
+
+# Plot 3: OMXH 25 vs Ticker price development comparisons
+chart_tickers = portfolio_df['Ticker'].unique()
+chart_tickers = chart_tickers.tolist()
+chart_tickers.append('^OMXH25')
+chart_tickers = np.array(chart_tickers)
+chart_tickers
+
+chart_start = datetime.datetime(2020, 1, 12)
+chart_end = datetime.datetime(2020, 12, 29)
+
+chart_data = get(chart_tickers, chart_start, chart_end)
+chart_data.head()
+chart_data.tail()
+chart_data_eval = chart_data[['Adj Close']]
+chart_data_eval.reset_index(inplace=True)
+
+chart_data_eval_pivot = pd.pivot_table(chart_data_eval, index='Date', columns='Ticker', values='Adj Close')
+chart_data_eval_pivot.reset_index(inplace=True)
+
+# Interpolate missing values with values around
+chart_data_eval_pivot_02 = chart_data_eval_pivot
+mask = chart_data_eval_pivot_02.iloc[:,[1,2,3,4]].interpolate(axis=0, limit_area='inside', limit=1, limit_direction='backward').isna()
+chart_data_eval_pivot_02_data = chart_data_eval_pivot_02.iloc[:,[1,2,3,4]].interpolate(axis=0, limit_area='inside', limit=1).mask(mask)
+
+# Index the prices to 100 (start date value)
+ind_constant = chart_data_eval_pivot_02_data.loc[0]
+chart_data_eval_pivot_02_data = (chart_data_eval_pivot_02_data/ind_constant)
+chart_data_eval_pivot_02_filled = pd.merge(chart_data_eval_pivot_02, chart_data_eval_pivot_02_data, right_index=True, left_index=True)
+
+del chart_data_eval_pivot_02_filled['ABB.ST_x']
+del chart_data_eval_pivot_02_filled['QCOM_x']
+del chart_data_eval_pivot_02_filled['REG1V.HE_x']
+del chart_data_eval_pivot_02_filled['^OMXH25_x']
+
+chart_data_eval_pivot_02_filled.rename(
+    columns={'ABB.ST_y': 'ABB.ST', 'QCOM_y': 'QCOM', 'REG1V.HE_y': 'REG1V.HE', '^OMXH25_y': '^OMXH25'},
+    inplace=True)
+
+# Plot 3
+trace1 = go.Scatter(
+    x=chart_data_eval_pivot_02_filled['Date'],
+    y=chart_data_eval_pivot_02_filled['^OMXH25'],
+    mode='lines',
+    name='OMXH Price')
+
+trace2 = go.Scatter(
+    x=chart_data_eval_pivot_02_filled['Date'],
+    y=chart_data_eval_pivot_02_filled['QCOM'],
+    mode='lines',
+    name='Qualcomm Price')
+
+trace3 = go.Scatter(
+    x=chart_data_eval_pivot_02_filled['Date'],
+    y=chart_data_eval_pivot_02_filled['REG1V.HE'],
+    mode='lines',
+    name='Revenio Price')
+
+trace4 = go.Scatter(
+    x=chart_data_eval_pivot_02_filled['Date'],
+    y=chart_data_eval_pivot_02_filled['ABB.ST'],
+    mode='lines',
+    name='ABB Price')
+
+data = [trace1, trace2, trace3, trace4]
+
+layout = go.Layout(title='Share Price development'
+                   , barmode='group'
+                   , yaxis=dict(title='Price (indexed)')
+                   , xaxis=dict(title='Ticker')
+                   , legend=dict(x=1, y=1)
+                   )
+
+fig = go.Figure(data=data, layout=layout)
+plot(fig)
+
+# Opacity to the start that changes to color on the time of acquisition
+
+# Plot 4: Pie chart for sector values
+# Calculate market cap per sector in a pivot
+pie_pivot = pd.pivot_table(merged_portfolio,
+                           index = 'Sector',
+                           values = 'Ticker Share Value',
+                           aggfunc = 'sum')
+pie_pivot.reset_index(inplace=True)
+
+trace = go.Pie(
+    labels=pie_pivot['Sector'],
+    values=pie_pivot['Ticker Share Value'],
+)
+plot([trace])
+
+# PLOTS WITH PLOTLY loppuu
+
 # # DATA OUTPUT
 # # Data outputs
 # merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high[
