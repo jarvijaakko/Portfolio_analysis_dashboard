@@ -1,7 +1,7 @@
 # Inspired by the wonderful tutorial by Kevin Boller:
 # (https://towardsdatascience.com/python-for-finance-stock-portfolio-analyses-6da4c3e61054)
 
-# Import necessary libraries
+# Import necessary libraries 
 import pandas as pd
 desired_width = 180
 pd.set_option('display.width', desired_width)
@@ -24,10 +24,10 @@ init_notebook_mode(connected=True)
 # Define the date variables
 # Make a function considering different opening dates and the time difference(!!!)
 start_omxh = datetime.datetime(2011, 12, 29)
-end_omxh = datetime.datetime(2020, 12, 7)
+end_omxh = datetime.datetime(2020, 12, 29)
 end_of_last_year = datetime.datetime(2019, 12, 30)
 start_stocks = datetime.datetime(2011, 12, 29)
-end_stocks = datetime.datetime(2020, 12, 7)
+end_stocks = datetime.datetime(2020, 12, 29)
 
 # DATA PULL
 # Pull OMXH25 data from Yahoo! Finance
@@ -39,7 +39,7 @@ omxh25_adj_close_start = omxh25_adj_close[omxh25_adj_close['Date'] == end_of_las
 
 # PORTFOLIO DATA PULL #
 # Read in the analyzed portfolio and pull corresponding data from Yahoo! Finance
-portfolio_df = pd.read_excel('Sample stocks acquisition dates_costs_real_02.xls')
+portfolio_df = pd.read_excel('Stocks_v3.xls')
 tickers = portfolio_df['Ticker'].unique()
 
 # Function for pulling the ticker data
@@ -317,7 +317,7 @@ chart_data_eval_pivot_02_filled = pd.merge(chart_data_eval_pivot_02, chart_data_
 columns_to_del = list(range(1,ticker_amount+1))
 chart_data_eval_pivot_02_filled = chart_data_eval_pivot_02_filled.drop(chart_data_eval_pivot_02_filled.columns[columns_to_del], 1)
 
-# Make
+# Make (?)
 
 # Plot 3
 trace1 = go.Scatter(
@@ -362,6 +362,21 @@ trace = go.Pie(
 )
 plot([trace])
 
+# Plot 5: Pie chart for geographical allocation
+# Calculate market cap per sector in a pivot
+pie_pivot_2 = pd.pivot_table(merged_portfolio,
+                           index = 'Country',
+                           values = 'Ticker Share Value',
+                           aggfunc = 'sum')
+pie_pivot_2.reset_index(inplace=True)
+
+trace_2 = go.Pie(
+    labels=pie_pivot_2['Country'],
+    values=pie_pivot_2['Ticker Share Value'],
+)
+plot([trace_2])
+
+
 # PLOTS WITH PLOTLY loppuu
 
 # DATA OUTPUT
@@ -398,8 +413,8 @@ chart_tickers_df.to_csv('tickers.csv', header=True, index=None)
 # 
 # # Write to file
 # os.getcwd()  # Check the home directory
-# merged_portfolio_omxh_latest_YTD_omxh_closing_high.to_csv('analyzed_portfolio.csv')
-# merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers.to_csv('tickers.csv')
+# merged_portfolio.to_csv('analyzed_portfolio.csv')
+# merged_portfolio['Ticker'].unique().to_csv('tickers.csv')
 # 
 # # Create tickers to be used in the dashboard's dropdown
 # merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers = merged_portfolio_omxh_latest_YTD_omxh_closing_high_tickers[

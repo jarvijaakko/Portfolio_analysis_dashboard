@@ -12,11 +12,7 @@ import os
 
 os.chdir('/home/vesis/Documents/Python/Portfolio_analysis')
 
-# Define the external CSS stylesheet to be used
-# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
 app = dash.Dash(__name__)
-# , external_stylesheets=external_stylesheets)
 
 tickers_saved = pd.read_csv('tickers.csv')
 tickers_saved.set_index('Ticker', inplace=True)
@@ -99,11 +95,21 @@ pie_pivot = pd.pivot_table(data,
                            aggfunc = 'sum')
 pie_pivot.reset_index(inplace=True)
 
+# Plot 5: Pie chart of countries
+pie_pivot_2 = pd.pivot_table(merged_portfolio,
+                           index = 'Country',
+                           values = 'Ticker Share Value',
+                           aggfunc = 'sum')
+pie_pivot_2.reset_index(inplace=True)
 
 options = []
 
 app = dash.Dash()
 app.layout = html.Div([
+    html.Div([
+        html.H2('Portfolio Analysis Dashboard')
+    ], className='banner'),
+    
     html.Div([
         html.Div([
             html.H3('Returns'),
@@ -168,7 +174,7 @@ app.layout = html.Div([
             html.H3('Prices'),
             dcc.Graph(id='g3', figure=fig_3
             )
-        ],className="eight columns"),
+        ],className="six columns"),
         html.Div([
             html.H3('Sectors'),
             dcc.Graph(id='g4', figure={'data': [
@@ -179,6 +185,16 @@ app.layout = html.Div([
             ],
 })
         ],className="four columns"),
+        html.Div([
+            html.H3('Countries'),
+            dcc.Graph(id='g5', figure={'data': [
+                go.Pie(
+                    labels=pie_pivot_2['Country'],
+                    values=pie_pivot_2['Ticker Share Value'],
+                )
+            ],
+})
+        ],className="two columns"),
     ],className = "row")
 ])
 

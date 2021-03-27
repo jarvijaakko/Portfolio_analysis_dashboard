@@ -24,10 +24,10 @@ init_notebook_mode(connected=True)
 
 # Define the date variables
 # Make a function considering different opening dates and the time difference(!!!)
-start_omxh = datetime.datetime(2019, 12, 29)
+start_omxh = datetime.datetime(2011, 12, 29)
 end_omxh = datetime.datetime(2020, 12, 7)
 end_of_last_year = datetime.datetime(2019, 12, 30)
-start_stocks = datetime.datetime(2019, 12, 29)
+start_stocks = datetime.datetime(2011, 12, 29)
 end_stocks = datetime.datetime(2020, 12, 7)
 
 # DATA PULL
