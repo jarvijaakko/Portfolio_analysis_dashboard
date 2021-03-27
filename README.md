@@ -10,7 +10,7 @@ The first script 'Portfolio_analysis_03.py' will take the Excel file as input an
 
 This file is taken as an input to the final script 'Portfolio_analysis_dash_03.py' that will produce the final HTML dashboard. This is done by plotting different metrics of interest from the portfolio using Plotly graphs and its Dash framework. Dash produces nice-looking, dynamic dashboards that allow easy zooming and variable exclusion, to name a few. In addition, all information is automatically updated according to the most recent stock market data to allow for up-to-date interpretation of portfolio performance.
 
-The final dashboard looks like the following. My future goals include incorporating this in some web platform, for example my homepage, to make the most out of this awesome application.
+The final dashboard looks like the following. My future goals include incorporating this in some web platform, for example my homepage, to make the most out of this awesome application. I am also planning to merge these two scripts into one as it would allow for a more flexible usage.
 
 ![dashboard_01](https://user-images.githubusercontent.com/69734538/112726996-ea760900-8f28-11eb-9d0b-7f71d238f269.png)
 
